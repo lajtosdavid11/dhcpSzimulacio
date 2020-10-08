@@ -87,21 +87,80 @@ namespace dhcpSzimulacio
             }
         }
 
-        
+        static void Feladat(string parancs)
+        {
+            //Parancs = "request;D193135570AB2"
+            /// először csak "request" foglalkozunk
+            /// Megnézzük hogy request-e
+            /// Ki kell szedni a MAC címet a parancsból
+            
+            if (parancs.Contains("request"))
+            {
+                string[] a = parancs.Split(';');
+                string mac = a[1];
+                if (dhcp.ContainsKey(mac))
+                {
+                    Console.WriteLine($"DHCP {mac} --> {dhcp[mac]}");
+                }
+                else
+                {
+                    if (reserved.ContainsKey(mac))
+                    {
+                        Console.WriteLine($"Reserved {mac} --> {reserved[mac]}");
+                        dhcp.Add(mac, reserved[mac]);
+                    }
+                    else
+                    {
+                        string indulo = "192.168.10.100";
+                        int okt4 = 100;
+                        while (okt4 < 200 && dhcp.ContainsValue(indulo) ||
+                            reserved.ContainsValue(indulo) || 
+                            excluded.Contains(indulo))
+                        {
+                            okt4++;
+                            indulo = CimEgyelno(indulo);
+                        }
 
+                        if (okt4 < 200)
+                        {
+                            Console.WriteLine($"kiosztott { mac} --> {indulo}");
+                            dhcp.Add(mac, indulo);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{mac} Nincs IP");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("nem oké");
+            }
+        }
+        static void Feladatok()
+        {
+            foreach (var command in commands)
+            {
+                Feladat(command);
+            }
+        }
+        
         static void Main(string[] args)
         {
             BeolvasList(excluded, "excluded.csv");
             BeolvasList(commands, "test.csv");
             BeolvDictionary(dhcp, "dhcp.csv");
             BeolvDictionary(reserved, "reserved.csv");
-            foreach (var t in commands)
-            {
-                Console.WriteLine(t);
-            }
 
+            Feladatok();
+            //foreach (var t in commands)
+            //{
+            //    Console.WriteLine(t);
+            //}
 
-
+            //Feladat("request");
+            
 
 
             Console.ReadKey();
