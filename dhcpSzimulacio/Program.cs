@@ -12,19 +12,18 @@ namespace dhcpSzimulacio
         static List<string> excluded = new List<string>();
         static Dictionary<string, string> dhcp = new Dictionary<string, string>();
         static Dictionary<string, string> reserved = new Dictionary<string, string>();
+        static List<string> commands = new List<string>();
 
-
-
-        static void BeolvExcluded()
+        static void BeolvasList(List<string> l, string fileneve)
         {
             try
             {
-                StreamReader sr = new StreamReader("excluded.csv");
+                StreamReader sr = new StreamReader(fileneve);
                 try
                 {
                     while (!sr.EndOfStream)
                     {
-                        excluded.Add(sr.ReadLine());
+                        l.Add(sr.ReadLine());
                     }
                 }
                 catch (Exception es)
@@ -78,9 +77,6 @@ namespace dhcpSzimulacio
                     d.Add(adatok[0], adatok[1]);
                 }
 
-
-
-
                 file.Close();
                
             }
@@ -91,13 +87,15 @@ namespace dhcpSzimulacio
             }
         }
 
+        
+
         static void Main(string[] args)
         {
-            BeolvExcluded();
-
+            BeolvasList(excluded, "excluded.csv");
+            BeolvasList(commands, "test.csv");
             BeolvDictionary(dhcp, "dhcp.csv");
             BeolvDictionary(reserved, "reserved.csv");
-            foreach (var t in reserved)
+            foreach (var t in commands)
             {
                 Console.WriteLine(t);
             }
